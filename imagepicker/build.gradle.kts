@@ -33,8 +33,8 @@ android {
         viewBinding = true
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -75,7 +75,7 @@ publishing {
         create("release", MavenPublication::class) {
             groupId = "com.github.raolokesh"
             artifactId = "imagepicker"
-            version = "1.0.4"
+            version = "1.0.5"
 
             afterEvaluate {
                 from(components["release"])
