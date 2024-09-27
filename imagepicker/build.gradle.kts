@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("kotlin-kapt")
-    `maven-publish`
+    id("maven-publish")
 }
 
 android {
@@ -75,7 +75,7 @@ publishing {
         create("release", MavenPublication::class) {
             groupId = "com.github.raolokesh"
             artifactId = "imagepicker"
-            version = "1.0.0"
+            version = "1.0.1"
 
             afterEvaluate {
                 from(components["release"])
