@@ -59,7 +59,8 @@ class CameraActivity : AppCompatActivity() {
         private val REQUIRED_PERMISSIONS = mutableListOf(
             android.Manifest.permission.CAMERA,
         ).apply {
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
                 add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
         }.apply {
