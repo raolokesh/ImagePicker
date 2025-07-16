@@ -75,7 +75,7 @@ publishing {
         create("release", MavenPublication::class) {
             groupId = "com.github.raolokesh"
             artifactId = "imagepicker"
-            version = "1.0.8"
+            version = "1.0.11"
 
             afterEvaluate {
                 from(components["release"])
