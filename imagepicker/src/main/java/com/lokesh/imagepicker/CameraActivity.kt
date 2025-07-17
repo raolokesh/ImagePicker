@@ -69,10 +69,6 @@ class CameraActivity : AppCompatActivity() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 add(android.Manifest.permission.READ_MEDIA_IMAGES)
             }
-        }.apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                add(android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) // Optional - for partial access
-            }
         }.toTypedArray()
     }
 
