@@ -11,6 +11,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -56,16 +57,21 @@ class CameraActivity : AppCompatActivity() {
 
         private const val TAG = "CameraApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+        @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
         private val REQUIRED_PERMISSIONS = mutableListOf(
             android.Manifest.permission.CAMERA,
         ).apply {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                 add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
                 add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
         }.apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 add(android.Manifest.permission.READ_MEDIA_IMAGES)
+            }
+        }.apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                add(android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) // Optional - for partial access
             }
         }.toTypedArray()
     }
@@ -187,6 +193,7 @@ class CameraActivity : AppCompatActivity() {
             ).show()
         } else {
             openCamera()
+            loadImagesFromGallery()
         }
     }
 
