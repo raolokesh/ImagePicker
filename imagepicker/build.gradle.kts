@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.lokesh.imagepicker"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
 //        applicationId = "com.lokesh.imagepicker"
@@ -75,7 +75,7 @@ publishing {
         create("release", MavenPublication::class) {
             groupId = "com.github.raolokesh"
             artifactId = "imagepicker"
-            version = "1.0.14"
+            version = "1.0.15"
 
             afterEvaluate {
                 from(components["release"])

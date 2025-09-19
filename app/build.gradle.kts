@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.lokesh.galleryimagepicker"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.lokesh.galleryimagepicker"
