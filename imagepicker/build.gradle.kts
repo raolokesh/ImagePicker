@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.lokesh.imagepicker"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
 //        applicationId = "com.lokesh.imagepicker"
@@ -57,7 +57,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    var camerax_version = "1.3.4"
+    var camerax_version = "1.5.0"
     implementation("androidx.camera:camera-core:${camerax_version}")
     implementation("androidx.camera:camera-camera2:${camerax_version}")
     implementation("androidx.camera:camera-lifecycle:${camerax_version}")
@@ -66,8 +66,8 @@ dependencies {
     implementation("androidx.camera:camera-view:${camerax_version}")
     implementation("androidx.camera:camera-extensions:${camerax_version}")
 
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    kapt("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("com.github.bumptech.glide:glide:5.0.5")
+    kapt("com.github.bumptech.glide:compiler:5.0.5")
 }
 
 publishing {
@@ -75,7 +75,7 @@ publishing {
         create("release", MavenPublication::class) {
             groupId = "com.github.raolokesh"
             artifactId = "imagepicker"
-            version = "1.0.15"
+            version = "1.0.16"
 
             afterEvaluate {
                 from(components["release"])
