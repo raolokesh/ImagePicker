@@ -4,14 +4,17 @@ import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -49,6 +52,11 @@ class CameraActivity : AppCompatActivity() {
     // gallery used
     private val imageUrlsGallery = ArrayList<String>()
 
+    private val requiredPermissions: Array<String>
+        get() {
+            return getRequiredPermissions()
+        }
+
     companion object {
         private var imageCount: Int = 0
         fun setImageCount(i: Int) {
@@ -70,6 +78,20 @@ class CameraActivity : AppCompatActivity() {
                 add(android.Manifest.permission.READ_MEDIA_IMAGES)
             }
         }.toTypedArray()
+
+        fun getRequiredPermissions(): Array<String> {
+            val permissions = mutableListOf(
+                android.Manifest.permission.CAMERA,
+            )
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                permissions.add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                permissions.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissions.add(android.Manifest.permission.READ_MEDIA_IMAGES)
+            }
+            return permissions.toTypedArray()
+        }
     }
 
 
@@ -164,10 +186,10 @@ class CameraActivity : AppCompatActivity() {
     // request permissions for camera and storage in the companion object REQUIRED_PERMISSIONS
 
     private fun requestPermissions() {
-        activityResultLauncher.launch(REQUIRED_PERMISSIONS)
+        activityResultLauncher.launch(requiredPermissions)
     }
 
-    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+    private fun allPermissionsGranted() = requiredPermissions.all {
         ContextCompat.checkSelfPermission(
             baseContext, it
         ) == PackageManager.PERMISSION_GRANTED
@@ -181,16 +203,34 @@ class CameraActivity : AppCompatActivity() {
         // Handle Permission granted/rejected
         var permissionGranted = true
         permissions.entries.forEach {
-            if (it.key in REQUIRED_PERMISSIONS && !it.value) permissionGranted = false
+            if (it.key in requiredPermissions && !it.value) permissionGranted = false
         }
         if (!permissionGranted) {
-            Toast.makeText(
-                baseContext, "Permission request denied", Toast.LENGTH_SHORT
-            ).show()
+            showPermissionDeniedDialog()
         } else {
             openCamera()
             loadImagesFromGallery()
         }
+    }
+
+
+    private fun showPermissionDeniedDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Permission Denied")
+            .setMessage("This feature requires camera and storage permissions. Please grant them in the app settings.")
+            .setPositiveButton("Go to Settings") { _, _ ->
+                // Intent to open the app settings
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+                finish() // Finish the activity as permissions are required
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+                finish() // Finish the activity as permissions are required
+            }
+            .show()
     }
 
     // when image click button is clicked this method is called
