@@ -69,9 +69,12 @@ class CameraActivity : AppCompatActivity() {
         private val REQUIRED_PERMISSIONS = mutableListOf(
             android.Manifest.permission.CAMERA,
         ).apply {
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                add(android.Manifest.permission.READ_MEDIA_IMAGES)
+            }
+            // For Android 12 (API 32) and below, use legacy storage permission.
+            else {
                 add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
         }.apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -83,13 +86,17 @@ class CameraActivity : AppCompatActivity() {
             val permissions = mutableListOf(
                 android.Manifest.permission.CAMERA,
             )
-            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
-                permissions.add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                permissions.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 permissions.add(android.Manifest.permission.READ_MEDIA_IMAGES)
             }
+            // For Android 12 (API 32) and below, use legacy storage permission.
+            else {
+                permissions.add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                permissions.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+
             return permissions.toTypedArray()
         }
     }
@@ -116,7 +123,7 @@ class CameraActivity : AppCompatActivity() {
         }
 
         // Button clicked listener to take picture
-        cameraBinding.imageClick.setOnClickListener { takephoto() }
+        cameraBinding.imageClick.setOnClickListener { takePhoto() }
         cameraBinding.cancelButton.setOnClickListener { finish() }
         cameraBinding.flashButton.setOnClickListener { flashLight() }
         cameraBinding.flipButton.setOnClickListener { flipCamera() }
@@ -234,7 +241,7 @@ class CameraActivity : AppCompatActivity() {
     }
 
     // when image click button is clicked this method is called
-    private fun takephoto() {
+    private fun takePhoto() {
 
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
