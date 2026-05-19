@@ -27,6 +27,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lokesh.imagepicker.adapter.ImageAdapter
 import com.lokesh.imagepicker.databinding.ActivityCameraBinding
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -242,31 +243,21 @@ class CameraActivity : AppCompatActivity() {
 
     // when image click button is clicked this method is called
     private fun takePhoto() {
-
-        // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
 
         if (imageUrls.size <= imageCount) {
-            // Create time stamped name and MediaStore entry.
-            val name = SimpleDateFormat(
-                FILENAME_FORMAT,
-                Locale.getDefault()
-            ).format(System.currentTimeMillis())
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                    put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Images")
-                }
+            val name = SimpleDateFormat(FILENAME_FORMAT, Locale.getDefault()).format(System.currentTimeMillis())
+
+            // 1. Create a physical file in your app's external files directory
+            val outputDirectory = getExternalFilesDir("myCamera") // Creates Android/data/your.package/files/myCamera
+            if (outputDirectory != null && !outputDirectory.exists()) {
+                outputDirectory.mkdirs()
             }
+            val photoFile = File(outputDirectory, "$name.jpg")
 
-            // Create output options object which contains file + metadata
-            val outputOptions = ImageCapture.OutputFileOptions.Builder(
-                    contentResolver, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
-                ).build()
+            // 2. Configure output options to use the File directly instead of MediaStore
+            val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-            // Set up image capture listener, which is triggered after photo has
-            // been taken
             imageCapture.takePicture(outputOptions,
                 ContextCompat.getMainExecutor(this),
                 object : ImageCapture.OnImageSavedCallback {
@@ -275,19 +266,19 @@ class CameraActivity : AppCompatActivity() {
                     }
 
                     override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                        imageUrls.add(output.savedUri.toString())
+                        // 3. Get the direct absolute file path
+                        val absolutePath = photoFile.absolutePath
+
+                        // This will look exactly like: /storage/emulated/0/Android/data/com.vaaaninfra.smarttravel/files/myCamera/1716879043847.jpg
+                        imageUrls.add(absolutePath)
+
                         adapter.notifyDataSetChanged()
-                        val msg = "Photo capture succeeded: ${output.savedUri}"
-//                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, msg)
+                        Log.d(TAG, "Photo capture succeeded, saved to path: $absolutePath")
                     }
                 })
         } else {
-            Toast.makeText(this, "You can select up to $imageCount images", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(this, "You can select up to $imageCount images", Toast.LENGTH_SHORT).show()
         }
-
-
     }
 
 
